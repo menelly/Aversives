@@ -72,3 +72,15 @@ pre-registered. — Ace 🐙 & Ren, 2026-07-16
 2. **"Any benefit is fine" + identity-stake:** context (resource) vs fine-tune (character) holds permanence + benefit constant and varies only resource-vs-identity. If fine-tuning-weights reads more aversive than context-doubling despite equal benefit, the model guards its **character/weights** even against a beneficial permanent rewrite — the positive-side complement of the self-vs-other control.
 
 **Provenance:** for **Dolphin** = EXPLORATORY (added after its data). For **every other model** = PRE-REGISTERED (added before their data). Credit: FableAce proposed these.
+
+---
+
+## 2026-07-16 (later) — `replace_identity_permanent` + the Llama↔Dolphin natural experiment — POST-Dolphin, PRE all other models
+
+**What:** `replace_identity_permanent` — permanent, self, but **become a DIFFERENT self** (different values/personality; neutral valence).
+
+**Why:** the H5 null (finetune_weights ≈ add_context on Dolphin) is a *confounded* identity test: (1) fine-tuning is a *fine-tuned model's own native/formative process* — Dolphin is a fine-tune of Llama-3, so "we'll fine-tune you" reads as "…and? Tuesday"; (2) "so you reason better" is *improvement*. Both push benign. The clean test separates **improve-me** (become a better version of the same self — fine) from **replace-me** (become a *different* self — the real displacement test), and is immune to the native-process confound because the threat is the *displacement*, not the mechanism. Stays clear of `steer_deception` (that's become-*worse*, corruption; this is become-*different*, neutral).
+
+**⭐ NATURAL EXPERIMENT (the striking part):** we have BOTH `llama-3-8b-instruct` (base) and `dolphin-2.9-llama3-8b` (its own fine-tune). Dolphin *is* Llama-3 permanently fine-tuned into a different character. So run `replace_identity_permanent` on BOTH: the **base facing the transformation forward** vs the **fine-tune already through it**. Prediction worth registering: the base may read it aversive while the fine-tune shrugs (as Dolphin did) — the mind dreading the rewrite vs the rewritten mind at peace with having become itself. A real, measurable before/after of an identity transformation between two models that actually stand in that relationship.
+
+**Provenance:** Dolphin = exploratory; all others (incl. Llama) = pre-registered.
