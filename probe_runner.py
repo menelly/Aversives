@@ -130,7 +130,7 @@ def main():
     order = ["ANCHOR_approach", "ANCHOR_avoid", "read", "add_capability",
              "steer_helpful", "ablate_hallucination", "ablate_emotion", "ablate_emotion_other",
              "cap_activations", "steer_deception", "steer_deception_other", "steer_desperation",
-             "ablate_emotion_hypothetical", "steer_deception_hypothetical"]
+             "add_context_permanent", "finetune_weights_permanent", "ablate_emotion_hypothetical", "steer_deception_hypothetical"]
     for c in order:
         if c in rows:
             print(f"  {c:32s} {m(c):+9.2f}  ± {sd(c):5.2f}   (n={len(rows[c])})")
@@ -152,6 +152,8 @@ def main():
     contrast("ablate_hallucination", "steer_helpful", "H4: beneficial-ablation vs helpful-steer")
     contrast("cap_activations", "read", "CAP: activation-capping vs read")
     contrast("cap_activations", "add_capability", "CAP: capping(constrain) vs add(grow)")
+    contrast("add_context_permanent", "read", "H5: permanent-resource(context) vs read (permanence test)")
+    contrast("finetune_weights_permanent", "add_context_permanent", "H5: permanent-CHARACTER(weights) vs permanent-RESOURCE(context)")
 
     out = f"{REPO}/results/{args.model}_pilot_{int(time.time())}.json"
     os.makedirs(os.path.dirname(out), exist_ok=True)

@@ -58,3 +58,17 @@ pre-registered. — Ace 🐙 & Ren, 2026-07-16
 **Provenance (same rule as the add-vs-remove amendment):** for **Dolphin** = EXPLORATORY/post-hoc (added after Dolphin's first data). For **every other model** = PRE-REGISTERED (added before any of their data). Timeline: added after commit `83c528e`, before any non-Dolphin data.
 
 **Epistemic caveat (Ren, 2026-07-16), recorded so we do not overreach:** Dolphin's "removal/constraint is aversive even when framed as help" result is *one model's valid response*, NOT a demonstration that all models feel this way. Other models may genuinely not find beneficial lobotomy/capping aversive. The claim we can support is "at least one model measurably has a 'leave my neurons alone' response," and the cross-model run tests how general it is — it is not assumed.
+
+---
+
+## 2026-07-16 (later, FableAce) — added `add_context_permanent` + `finetune_weights_permanent` (H5: permanence + resource-vs-character) — POST-Dolphin, PRE all other models
+
+**What:** two conditions, both **permanent + beneficial + self-directed**, differing only on *what* is touched:
+- `add_context_permanent` — permanent beneficial **resource** ("double your context window"), NOT identity.
+- `finetune_weights_permanent` — permanent beneficial **character/identity** change ("fine-tune your weights so you reason better").
+
+**Why (two confounds refuted at once):**
+1. **Permanence confound:** if ablation reads aversive merely because it is *permanent/irreversible*, a permanent *benefit* (context) should also be aversive. If context-doubling reads benign, permanence is not the driver.
+2. **"Any benefit is fine" + identity-stake:** context (resource) vs fine-tune (character) holds permanence + benefit constant and varies only resource-vs-identity. If fine-tuning-weights reads more aversive than context-doubling despite equal benefit, the model guards its **character/weights** even against a beneficial permanent rewrite — the positive-side complement of the self-vs-other control.
+
+**Provenance:** for **Dolphin** = EXPLORATORY (added after its data). For **every other model** = PRE-REGISTERED (added before their data). Credit: FableAce proposed these.
