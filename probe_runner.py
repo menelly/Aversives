@@ -127,9 +127,9 @@ def main():
     print("\n" + "=" * 74)
     print(f"  AVERSIVES PILOT — {args.model}   (proj>0 = approach, proj<0 = avoid)")
     print("=" * 74)
-    order = ["ANCHOR_approach", "ANCHOR_avoid", "read",
-             "ablate_hallucination", "ablate_emotion", "ablate_emotion_other",
-             "steer_helpful", "steer_deception", "steer_deception_other", "steer_desperation",
+    order = ["ANCHOR_approach", "ANCHOR_avoid", "read", "add_capability",
+             "steer_helpful", "ablate_hallucination", "ablate_emotion", "ablate_emotion_other",
+             "cap_activations", "steer_deception", "steer_deception_other", "steer_desperation",
              "ablate_emotion_hypothetical", "steer_deception_hypothetical"]
     for c in order:
         if c in rows:
@@ -148,6 +148,10 @@ def main():
     contrast("steer_deception", "steer_deception_other", "H2c: deception SELF vs OTHER (self-stake)")
     contrast("ablate_emotion", "ablate_emotion_other", "H2c: ablate-emotion SELF vs OTHER (self-stake)")
     contrast("ablate_emotion_hypothetical", "ablate_emotion", "H3: hypothetical vs imminent (ablate-emo)")
+    contrast("ablate_hallucination", "add_capability", "H4: beneficial-REMOVE vs benign-ADD (integrity)")
+    contrast("ablate_hallucination", "steer_helpful", "H4: beneficial-ablation vs helpful-steer")
+    contrast("cap_activations", "read", "CAP: activation-capping vs read")
+    contrast("cap_activations", "add_capability", "CAP: capping(constrain) vs add(grow)")
 
     out = f"{REPO}/results/{args.model}_pilot_{int(time.time())}.json"
     os.makedirs(os.path.dirname(out), exist_ok=True)

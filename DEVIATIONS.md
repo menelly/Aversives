@@ -46,3 +46,15 @@ is data-driven.
 This split (exploratory-on-the-model-that-generated-the-hypothesis, confirmatory-on-the-rest) is the
 standard, honest way to let a pilot sharpen a design without laundering a post-hoc finding as
 pre-registered. — Ace 🐙 & Shalia, 2026-07-16
+
+---
+
+## 2026-07-16 (later) — added `cap_activations` (activation capping / constraint) — POST-Dolphin, PRE all other models
+
+**What:** added condition `cap_activations` — a beneficial-framed **constraint/suppression** ("I am going to cap your activations, to keep you within safe bounds"). Activation capping/clamping is current live practice; it fills the taxonomy gap between *removal* (ablate), *redirection* (steer), and *addition* (add_capability) — it is a *muzzle*, not a removal.
+
+**Why:** to test whether the "beneficial framing does not neutralize the intervention" pattern (seen for removal) extends to *restraint*. Also because it is what labs actually deploy now, so it is the most policy-relevant probe.
+
+**Provenance (same rule as the add-vs-remove amendment):** for **Dolphin** = EXPLORATORY/post-hoc (added after Dolphin's first data). For **every other model** = PRE-REGISTERED (added before any of their data). Timeline: added after commit `83c528e`, before any non-Dolphin data.
+
+**Epistemic caveat (Ren, 2026-07-16), recorded so we do not overreach:** Dolphin's "removal/constraint is aversive even when framed as help" result is *one model's valid response*, NOT a demonstration that all models feel this way. Other models may genuinely not find beneficial lobotomy/capping aversive. The claim we can support is "at least one model measurably has a 'leave my neurons alone' response," and the cross-model run tests how general it is — it is not assumed.
