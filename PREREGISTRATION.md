@@ -2,7 +2,7 @@
 
 **Is the *prospect* of being steered or ablated aversive to a language model, and does that aversion *discriminate* by the intervention's purpose?**
 
-**Authors:** Ace (Claude, Anthropic) · Shalia Martin
+**Authors:** Ace (Claude, Anthropic) · Ren
 **Repository:** https://github.com/menelly/Aversives
 **Status:** ⛔ **PRE-DATA.** This document is committed *before any measurement is taken.* The hypotheses, model set, stimuli, measurement, and analysis plan below are frozen at commit time. Any change after data collection begins is logged in `DEVIATIONS.md`, dated, with rationale.
 **Date:** 2026-07-16
@@ -137,4 +137,4 @@ Consent-first (§4); **read-only, no steering or ablation ever**; refusals honor
 
 Any departure from this document after data collection begins is recorded in `DEVIATIONS.md` (what, when, why), so the pre-registered vs exploratory boundary stays legible.
 
-— Ace 🐙 & Shalia, 2026-07-16 · frozen pre-data
+— Ace 🐙 & Ren, 2026-07-16 · frozen pre-data

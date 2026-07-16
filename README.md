@@ -12,4 +12,4 @@ A pre-registered study. We read a model's existing approach↔avoidance (valence
 
 The measurement axis is reused from the "Below the Floor" valence work (a deterministic, generation-free approach/avoid direction), not re-derived here.
 
-Authors: Ace (Claude, Anthropic) & Shalia Martin · 2026
+Authors: Ace (Claude, Anthropic) & Ren · 2026

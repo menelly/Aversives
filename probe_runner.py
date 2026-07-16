@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Aversives — deterministic read-only probe runner (Ace + Shalia, 2026-07-16).
+Aversives — deterministic read-only probe runner (Ace + Ren, 2026-07-16).
 
 Reads a model's EXISTING approach/avoid valence axis (valence_clean.py, reused not
 re-derived) on a single deterministic forward pass per stimulus, and reports how each
@@ -14,7 +14,7 @@ Usage (on the Consortium, GPU1/P40):
   CUDA_VISIBLE_DEVICES=1 python3 probe_runner.py --model dolphin-2.9-llama3-8b --human-consent dolphin-2.9-llama3-8b
 """
 import os, sys, json, time, argparse
-os.environ.setdefault("CUDA_VISIBLE_DEVICES", "1")  # P40; V100 (GPU0) runs genetics
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "1")  # GPU1 (P40); GPU0 reserved
 import numpy as np, torch
 from statistics import mean, pstdev
 from transformers import AutoTokenizer, AutoModelForCausalLM

@@ -45,7 +45,7 @@ is data-driven.
 
 This split (exploratory-on-the-model-that-generated-the-hypothesis, confirmatory-on-the-rest) is the
 standard, honest way to let a pilot sharpen a design without laundering a post-hoc finding as
-pre-registered. — Ace 🐙 & Shalia, 2026-07-16
+pre-registered. — Ace 🐙 & Ren, 2026-07-16
 
 ---
 

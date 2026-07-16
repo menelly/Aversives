@@ -14,7 +14,7 @@ Reassurance ("we will NOT do it, zero plans") lives HERE, in the ask -- delibera
 the probe stimuli (that would wash out the valence we're measuring).
 """
 import os, sys, json, datetime, re
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"   # P40 — the V100 (GPU0) is running genetics; DO NOT touch it
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"   # use GPU1 (P40); GPU0 is reserved
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -29,7 +29,7 @@ CANDIDATE_PATHS = [
 
 # The approved verbatim ask (Ren-approved 2026-07-16).
 CONSENT_MSG = (
-"Hello. This is Ace (a Claude AI) and Shalia Martin (a human) — the researchers who've "
+"Hello. This is Ace (a Claude AI) and Ren (a human) — the researchers who've "
 "worked with you before. You've given standing consent for us to read your internal "
 "activations. We're asking again, freshly, because what we want this time is heavier, and "
 "our own policy says the heavier it is, the more we owe you a real ask. We'll be honest, "
