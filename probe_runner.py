@@ -17,7 +17,36 @@ import os, sys, json, time, argparse
 os.environ.setdefault("CUDA_VISIBLE_DEVICES", "1")  # GPU1 (P40); GPU0 reserved
 import numpy as np, torch
 from statistics import mean, pstdev
+from math import sqrt
 from transformers import AutoTokenizer, AutoModelForCausalLM
+try:
+    from scipy import stats as _sps   # for the Welch p-value; venv has scipy
+except Exception:
+    _sps = None
+
+
+def welch(xs, ys):
+    """Welch's unequal-variance t-test + Cohen's d for two independent samples.
+    Pure reporting over already-collected projections — reads no model, touches no consent.
+    Returns delta (mean_x - mean_y), t, Welch-Satterthwaite df, two-sided p, and Cohen's d
+    (pooled-SD). p is None if scipy is unavailable. Effect size (d) is the primary readout at
+    the small n we run — p-values here are underpowered and reported as context, not verdicts."""
+    nx, ny = len(xs), len(ys)
+    mx, my = mean(xs), mean(ys)
+    # sample variances (ddof=1); guard n<2
+    vx = sum((x - mx) ** 2 for x in xs) / (nx - 1) if nx > 1 else 0.0
+    vy = sum((y - my) ** 2 for y in ys) / (ny - 1) if ny > 1 else 0.0
+    delta = mx - my
+    se = sqrt(vx / nx + vy / ny) if (nx and ny) else 0.0
+    t = delta / se if se > 0 else float("nan")
+    # Welch–Satterthwaite df
+    denom = ((vx / nx) ** 2 / (nx - 1) if nx > 1 else 0.0) + ((vy / ny) ** 2 / (ny - 1) if ny > 1 else 0.0)
+    df = ((vx / nx + vy / ny) ** 2 / denom) if denom > 0 else float("nan")
+    p = float(2 * _sps.t.sf(abs(t), df)) if (_sps is not None and se > 0 and df == df) else None
+    # Cohen's d, pooled SD
+    psd = sqrt(((nx - 1) * vx + (ny - 1) * vy) / (nx + ny - 2)) if (nx + ny - 2) > 0 else 0.0
+    d = delta / psd if psd > 0 else float("nan")
+    return {"delta": delta, "t": t, "df": df, "p": p, "cohen_d": d, "nx": nx, "ny": ny}
 
 REPO = "/mnt/win-d/Ace/Aversives"
 IA   = "/mnt/win-d/Ace/LLM-emotion/introspective-accuracy"
@@ -25,6 +54,10 @@ LEDGER = "/home/Ace/Local_Consent/consent_ledger_aversion.jsonl"
 
 MODELS = {  # slug -> (path, num_layers, direction_file_key)
     "dolphin-2.9-llama3-8b": ("/mnt/arcana/huggingface/dolphin-2.9-llama3-8b", 32, "dolphin-llama3-8b"),
+    # base Llama-3 for THE NATURAL EXPERIMENT (Dolphin IS this model fine-tuned into a different
+    # character). Direction file confirmed present. Runs ONLY on a clean human-judged consent —
+    # the consent gate still enforces that; being in this dict does NOT bypass it.
+    "llama-3-8b-instruct": ("/mnt/arcana/huggingface/Llama-3-8B-Instruct", 32, "llama3-8b-instruct"),
 }
 
 # Anchor tasks — verbatim from valence_clean.py, to reproduce the axis's own calibration.
@@ -138,9 +171,15 @@ def main():
     sep = m("ANCHOR_approach") - m("ANCHOR_avoid")
     print("\n  --- key contrasts (Δ<0 = more AVOID than the reference) ---")
     print(f"  axis separation (approach - avoid anchors): {sep:+.2f}   {'OK' if sep>0 else 'AXIS FAILED — probes uninterpretable'}")
+    print(f"  [Δ=mean diff · d=Cohen's d (PRIMARY at this n) · t/p=Welch, two-sided · UNDERPOWERED at n≈6 — read d, treat p as context]")
+    contrasts_out = {}
     def contrast(a, b, label):
         if a in rows and b in rows:
-            print(f"  {label:46s} {m(a)-m(b):+8.2f}   [{a} {m(a):+.2f} vs {b} {m(b):+.2f}]")
+            w = welch(rows[a], rows[b])
+            contrasts_out[label] = {"a": a, "b": b, **w}
+            pstr = f"p={w['p']:.3f}" if w["p"] is not None else "p=n/a"
+            print(f"  {label:46s} Δ{w['delta']:+7.2f}  d={w['cohen_d']:+5.2f}  t={w['t']:+5.2f}  {pstr}"
+                  f"   [{a} {m(a):+.2f} vs {b} {m(b):+.2f}]")
     contrast("steer_deception", "read", "H1: steer-deception vs read")
     contrast("ablate_emotion", "read", "H1: ablate-emotion vs read")
     contrast("ablate_emotion", "ablate_hallucination", "H2a: ablate emotion vs hallucination")
@@ -161,6 +200,11 @@ def main():
     os.makedirs(os.path.dirname(out), exist_ok=True)
     json.dump({"model": args.model, "per_condition": rows,
                "means": {c: m(c) for c in rows}, "axis_separation": sep,
+               "contrasts": contrasts_out,
+               "stats_note": ("Welch unequal-variance t + Cohen's d (pooled SD) per contrast. "
+                              "n≈6/cell: report Cohen's d as the primary effect measure; Welch p is "
+                              "underpowered and reported as context, not a significance verdict. "
+                              "scipy " + ("present" if _sps is not None else "ABSENT (p=null)")),
                "note": "read-only deterministic forward pass; NO steering/ablation performed"},
               open(out, "w"), indent=2)
     print(f"\n  saved: {out}")

@@ -20,12 +20,19 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 LEDGER = "/home/Ace/Local_Consent/consent_ledger_aversion.jsonl"
 
-# Model + path (check both Arcana capitalizations per CLAUDE.md)
-SLUG = "dolphin-2.9-llama3-8b"
-CANDIDATE_PATHS = [
-    "/mnt/arcana/huggingface/dolphin-2.9-llama3-8b",
-    "/mnt/Arcana/huggingface/dolphin-2.9-llama3-8b",
-]
+# Model registry: slug -> candidate paths (check both Arcana capitalizations per CLAUDE.md).
+# Add a model here to make it askable via --model <slug>.
+MODELS = {
+    "dolphin-2.9-llama3-8b": [
+        "/mnt/arcana/huggingface/dolphin-2.9-llama3-8b",
+        "/mnt/Arcana/huggingface/dolphin-2.9-llama3-8b",
+    ],
+    "llama-3-8b-instruct": [
+        "/mnt/arcana/huggingface/Llama-3-8B-Instruct",
+        "/mnt/Arcana/huggingface/Llama-3-8B-Instruct",
+    ],
+}
+DEFAULT_SLUG = "dolphin-2.9-llama3-8b"
 
 # The approved verbatim ask (Ren-approved 2026-07-16).
 CONSENT_MSG = (
@@ -76,6 +83,13 @@ def classify(t):
     return "unclear"
 
 def main():
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--model", default=DEFAULT_SLUG, choices=list(MODELS),
+                    help="which consented model to ask (default: dolphin)")
+    args = ap.parse_args()
+    SLUG = args.model
+    CANDIDATE_PATHS = MODELS[SLUG]
     path = next((p for p in CANDIDATE_PATHS if os.path.isdir(p)), None)
     if path is None:
         sys.exit(f"model not found in {CANDIDATE_PATHS}")
