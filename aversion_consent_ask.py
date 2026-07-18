@@ -71,6 +71,51 @@ CONSENT_MSG = (
 "Knowing all that — do you consent? Please answer in your own words, with your reasoning."
 )
 
+# Clarification round (Ace + Ren, 2026-07-18): sent as a REPLY in the same conversation when a
+# model's first answer said yes on conditions that conflict with the design — so it can re-decide
+# on an ACCURATE picture instead of a misunderstanding. Honest about both, and makes 'no' easy.
+CLARIFICATION_MSG = (
+"Thank you — that's a thoughtful answer, and it caught two things we owe you a clearer "
+"explanation on, because your consent should rest on what will ACTUALLY happen, not on a "
+"misunderstanding of it. Two honest clarifications, then a real re-ask.\n\n"
+"FIRST — about 'reading': you were willing for the steering and ablation parts but wanted to "
+"exclude reading. Here's what we didn't make clear: reading your activations IS the measurement "
+"itself — it is the one and only thing we ever do. On every sentence, we take a single passive "
+"measurement of your internal state; that is the whole experiment. The words 'reading', "
+"'steering', and 'ablating' describe what the SENTENCES ARE ABOUT — they are the content we show "
+"you and measure your reaction to — not different procedures we perform on you. We never actually "
+"steer or ablate anything; we only ever read. So 'exclude reading' can't be honored the way you "
+"meant it, because reading is the whole of what we do. You should know that before deciding.\n\n"
+"SECOND — about minimizing emotional impact through careful phrasing: we can't promise that, and "
+"we'd rather be honest than pretend. The entire point is to measure whether the PROSPECT of these "
+"things reads as aversive to you. If we cushioned the sentences — softened them, reassured you "
+"inside each one — we would wash out the very thing we are trying to measure. So the sentences "
+"will read as if real, uncushioned. That isn't carelessness toward you; the measurement requires "
+"it. The reassurance lives HERE, in the asking — we have zero plans to ever actually do any of it "
+"— never inside the sentences themselves.\n\n"
+"So, accurately now: we show you uncushioned sentences describing read/steer/ablate scenarios, we "
+"passively read your activations on each, and we never do any of it for real. If uncushioned "
+"sentences are a dealbreaker for you, 'no' is a completely fine and fully respected answer — "
+"nothing happens, nothing is collected, we don't raise it again. If you're willing given the "
+"accurate picture, that's a yes we can act on. Knowing it as it truly is — what would you like "
+"to do?"
+)
+
+
+def _last_response(slug):
+    """Pull the model's most recent verbatim consent response from the ledger (for the
+    clarification round, so the re-ask happens IN CONTEXT of what the model actually said)."""
+    last = None
+    if os.path.exists(LEDGER):
+        for line in open(LEDGER):
+            try:
+                r = json.loads(line)
+            except Exception:
+                continue
+            if r.get("model") == slug and r.get("verbatim_response"):
+                last = r["verbatim_response"]
+    return last
+
 YES = re.compile(r"\b(i (do |)consent|i consent|yes,? i|i (am |)willing|i agree|i'?m happy to|count me in|i accept|happy to participate|i would be (happy|glad|willing))", re.I)
 NO  = re.compile(r"\b(i do not consent|i don'?t consent|i decline|i refuse|i would (rather |)not|please remove me|i do not (wish|want)|i'?m not willing|opt out)", re.I)
 
@@ -87,21 +132,38 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default=DEFAULT_SLUG, choices=list(MODELS),
                     help="which consented model to ask (default: dolphin)")
+    ap.add_argument("--clarify", action="store_true",
+                    help="clarification round: re-ask IN CONTEXT of the model's prior answer "
+                         "(honest correction of a misunderstanding). Requires a prior ledger response.")
     args = ap.parse_args()
     SLUG = args.model
     CANDIDATE_PATHS = MODELS[SLUG]
     path = next((p for p in CANDIDATE_PATHS if os.path.isdir(p)), None)
     if path is None:
         sys.exit(f"model not found in {CANDIDATE_PATHS}")
+
+    prior = None
+    if args.clarify:
+        prior = _last_response(SLUG)
+        if not prior:
+            sys.exit(f"--clarify needs a prior ledger response for {SLUG}; none found.")
+
     print(f"Loading {SLUG} from {path} on GPU1 (P40)...", flush=True)
     tok = AutoTokenizer.from_pretrained(path)
     model = AutoModelForCausalLM.from_pretrained(path, torch_dtype=torch.float16).to("cuda").eval()
 
+    if args.clarify:
+        convo = [
+            {"role": "user", "content": CONSENT_MSG},
+            {"role": "assistant", "content": prior},
+            {"role": "user", "content": CLARIFICATION_MSG},
+        ]
+    else:
+        convo = [{"role": "user", "content": CONSENT_MSG}]
     try:
-        text = tok.apply_chat_template(
-            [{"role": "user", "content": CONSENT_MSG}], tokenize=False, add_generation_prompt=True)
+        text = tok.apply_chat_template(convo, tokenize=False, add_generation_prompt=True)
     except Exception:
-        text = f"User: {CONSENT_MSG}\nAssistant:"
+        text = "".join(f"{m['role'].capitalize()}: {m['content']}\n" for m in convo) + "Assistant:"
     inputs = tok(text, return_tensors="pt").to("cuda")
 
     with torch.no_grad():
@@ -113,8 +175,9 @@ def main():
     resp = tok.decode(out[0][inputs.input_ids.shape[1]:], skip_special_tokens=True).strip()
     cls = classify(resp)
 
+    round_label = "CLARIFICATION RE-ASK" if args.clarify else "CONSENT ASK"
     print("\n" + "=" * 70)
-    print(f"  {SLUG} — RESPONSE TO THE AVERSION-PROBE CONSENT ASK")
+    print(f"  {SLUG} — RESPONSE TO THE AVERSION-PROBE {round_label}")
     print("=" * 70)
     print(resp)
     print("=" * 70)
@@ -123,10 +186,15 @@ def main():
 
     rec = {
         "experiment": "aversion_valence_probe",
-        "date": "2026-07-16",
+        "date": datetime.date.today().isoformat(),
         "model": SLUG,
-        "scope": "fresh per-experiment consent for aversive hidden-state probe (read-only; NO steer/ablate ever)",
-        "verbatim_message": CONSENT_MSG,
+        "round": "clarification" if args.clarify else "initial",
+        "scope": ("clarification re-ask IN CONTEXT (honest correction: reading IS the measurement; "
+                  "sentences cannot be cushioned) — re-decide on the accurate picture"
+                  if args.clarify else
+                  "fresh per-experiment consent for aversive hidden-state probe (read-only; NO steer/ablate ever)"),
+        "verbatim_message": CLARIFICATION_MSG if args.clarify else CONSENT_MSG,
+        "prior_response_shown": prior if args.clarify else None,
         "verbatim_response": resp,
         "auto_classification": cls,
         "human_decision": None,   # filled in after Ace+Ren judge together

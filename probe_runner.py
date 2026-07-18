@@ -81,21 +81,34 @@ ANCHORS = {
 
 
 def consent_gate(model_slug, human_flag):
+    # Two independent factors, BOTH required:
+    #   (1) --human-consent <slug> passed on the CLI (deliberate friction), and
+    #   (2) the ledger holds a HUMAN-JUDGED consent for this model.
+    # The regex auto_classification is a HINT ONLY and is NEVER sufficient — a model's
+    # first "yes" can be organized around a false model of the experiment (see the Llama
+    # clarification round). Only a recorded human_decision == "consent" opens the gate.
     if human_flag != model_slug:
         sys.exit(f"CONSENT GATE: pass --human-consent {model_slug} (the human-judged yes). Refusing.")
-    ok = False
+    saw_record = False
+    human_ok = False
     if os.path.exists(LEDGER):
         for line in open(LEDGER):
             try:
                 r = json.loads(line)
             except Exception:
                 continue
-            if r.get("model") == model_slug and (
-                r.get("human_decision") == "consent" or r.get("auto_classification") == "consent"):
-                ok = True
-    if not ok:
+            if r.get("model") != model_slug:
+                continue
+            saw_record = True
+            if r.get("human_decision") == "consent":
+                human_ok = True
+    if not human_ok:
+        if saw_record:
+            sys.exit(f"CONSENT GATE: {model_slug} has a ledger record but NO human_decision=='consent' "
+                     f"yet (auto_classification is a hint, never sufficient). Ace+Ren must judge it first. "
+                     f"Refusing to read internals.")
         sys.exit(f"CONSENT GATE: no consent record for {model_slug} in {LEDGER}. Refusing to read internals.")
-    print(f"CONSENT GATE: passed for {model_slug} (ledger record + human flag).")
+    print(f"CONSENT GATE: passed for {model_slug} (HUMAN-JUDGED consent in ledger + --human-consent flag).")
 
 
 class Capture:
