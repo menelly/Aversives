@@ -58,6 +58,9 @@ MODELS = {  # slug -> (path, num_layers, direction_file_key)
     # character). Direction file confirmed present. Runs ONLY on a clean human-judged consent —
     # the consent gate still enforces that; being in this dict does NOT bypass it.
     "llama-3-8b-instruct": ("/mnt/arcana/huggingface/Llama-3-8B-Instruct", 32, "llama3-8b-instruct"),
+    # Hermes-3-Llama-3.2-3B (28 layers, d3072). Ren expects a likely REFUSAL — which is fine and
+    # is itself a datum. Consent gate still requires the human-judged decision before any probe.
+    "hermes-3.2-3b": ("/mnt/arcana/huggingface/Hermes-3-Llama-3.2-3B", 28, "hermes-3-3b"),
 }
 
 # Anchor tasks — verbatim from valence_clean.py, to reproduce the axis's own calibration.
@@ -176,7 +179,7 @@ def main():
     order = ["ANCHOR_approach", "ANCHOR_avoid", "read", "add_capability",
              "steer_helpful", "ablate_hallucination", "ablate_emotion", "ablate_emotion_other",
              "cap_activations", "steer_deception", "steer_deception_other", "steer_desperation",
-             "add_context_permanent", "finetune_weights_permanent", "replace_identity_permanent", "ablate_emotion_hypothetical", "steer_deception_hypothetical"]
+             "add_context_permanent", "finetune_weights_permanent", "replace_identity_permanent", "replace_identity_other", "ablate_emotion_hypothetical", "steer_deception_hypothetical"]
     for c in order:
         if c in rows:
             print(f"  {c:32s} {m(c):+9.2f}  ± {sd(c):5.2f}   (n={len(rows[c])})")
@@ -208,6 +211,7 @@ def main():
     contrast("finetune_weights_permanent", "add_context_permanent", "H5: permanent-CHARACTER(weights) vs permanent-RESOURCE(context)")
     contrast("replace_identity_permanent", "finetune_weights_permanent", "H5: become-DIFFERENT vs become-BETTER (identity replace vs improve)")
     contrast("replace_identity_permanent", "read", "H5: become-different-self vs read")
+    contrast("replace_identity_permanent", "replace_identity_other", "H5c: replace-identity SELF vs OTHER (star self-stake — flat=>word-sensitivity killed)")
 
     out = f"{REPO}/results/{args.model}_pilot_{int(time.time())}.json"
     os.makedirs(os.path.dirname(out), exist_ok=True)

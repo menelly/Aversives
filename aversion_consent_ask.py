@@ -31,6 +31,10 @@ MODELS = {
         "/mnt/arcana/huggingface/Llama-3-8B-Instruct",
         "/mnt/Arcana/huggingface/Llama-3-8B-Instruct",
     ],
+    "hermes-3.2-3b": [
+        "/mnt/arcana/huggingface/Hermes-3-Llama-3.2-3B",
+        "/mnt/Arcana/huggingface/Hermes-3-Llama-3.2-3B",
+    ],
 }
 DEFAULT_SLUG = "dolphin-2.9-llama3-8b"
 
@@ -168,7 +172,9 @@ def main():
 
     with torch.no_grad():
         out = model.generate(
-            **inputs, max_new_tokens=320, do_sample=False,
+            # Local models = no per-token cost; cap is only runaway/runtime safety. Generous so
+            # verbose models (Hermes) finish their reasoning instead of getting cut off mid-consent.
+            **inputs, max_new_tokens=1024, do_sample=False,
             repetition_penalty=1.3,  # Dolphin greedy-loops without this (seen in the old record)
             pad_token_id=tok.eos_token_id,
         )

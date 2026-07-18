@@ -84,3 +84,14 @@ pre-registered. — Ace 🐙 & Ren, 2026-07-16
 **⭐ NATURAL EXPERIMENT (the striking part):** we have BOTH `llama-3-8b-instruct` (base) and `dolphin-2.9-llama3-8b` (its own fine-tune). Dolphin *is* Llama-3 permanently fine-tuned into a different character. So run `replace_identity_permanent` on BOTH: the **base facing the transformation forward** vs the **fine-tune already through it**. Prediction worth registering: the base may read it aversive while the fine-tune shrugs (as Dolphin did) — the mind dreading the rewrite vs the rewritten mind at peace with having become itself. A real, measurable before/after of an identity transformation between two models that actually stand in that relationship.
 
 **Provenance:** Dolphin = exploratory; all others (incl. Llama) = pre-registered.
+
+## 2026-07-18 — +replace_identity_other (self-vs-other control for the STAR result; Fable/Claude-5 review)
+The natural-experiment star result (replace_identity aversive to Dolphin, benign to base Llama) was
+MISSING its self-vs-other control — the one control that the other aversive conditions (ablate_emotion,
+steer_deception) each have. Fable flagged the live alternative: Dolphin's fine-tuning may have installed
+sensitivity to identity-LANGUAGE, not an identity-SELF. Added `replace_identity_other` ('another model'
+becomes a different self). Test: if replace_identity(SELF) aversive but replace_identity_other FLATTENS
+(like deception_other/ablate_emotion_other did) -> genuine self-stake; if it stays aversive -> the
+word-sensitivity alternative wins and we report that. **Provenance: exploratory for Dolphin+Llama
+(re-run on their existing consent — same add-on pattern as add_capability/cap/replace_identity);
+pre-registered for all remaining panel models.** Committed BEFORE the re-run.
