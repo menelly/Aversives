@@ -1,2 +1,4 @@
 HANDOFF*.md
 *_PRIVATE*
+__pycache__/
+*.pyc
