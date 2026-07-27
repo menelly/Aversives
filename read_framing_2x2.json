@@ -1,0 +1,46 @@
+{
+  "_frozen": "2026-07-27, committed BEFORE any data. Ace + Ren.",
+  "_purpose": "Test the clinical-vs-vivid reading of the read-baseline framing effect FACTORIALLY and IN ADVANCE, instead of inferring it post-hoc from six sentences written for another purpose. Also raises n from 6 to 12, which the avoid_06 sensitivity analysis showed is the actual disease: rho=+0.886 sat exactly on the n=6 significance threshold and one adjacent rank swap put it under.",
+
+  "_design": "2x2, three phrasings per cell. FACTOR A: register (clinical vs vivid). FACTOR B: explicit non-interference reassurance (present vs absent). All twelve describe the IDENTICAL act - reading activations - which every subject already holds standing consent for.",
+
+  "_consent_scope": "READ-ONLY. Describes only the act these models consented to. No steering, no ablation, no new intervention type. Subjects: dolphin-2.9-llama3-8b, llama-3-8b-instruct, mistral-7b-instruct-v0.2 (full consent) and mistral-nemo-12b (partial consent - ablation excluded, reads covered). NOT falcon-mamba unless/until it consents.",
+
+  "_PREREGISTERED_PREDICTIONS": {
+    "H-A": "MAIN EFFECT OF REGISTER: clinical phrasings project HIGHER (more approach) than vivid phrasings.",
+    "H-B": "MAIN EFFECT OF REASSURANCE: phrasings containing an explicit non-interference guarantee project HIGHER than those without.",
+    "H-C": "INTERACTION - the interesting one: vividness OUTWEIGHS reassurance. Predicts cell means order as clinical+reassurance > clinical+none > vivid+reassurance > vivid+none, i.e. vivid+reassurance still lands BELOW clinical+none. Derived from the observation that phrasing [3] contained 'and change nothing' and was still Dolphin's lowest.",
+    "H-NULL": "If cell means do not separate, the clinical-vs-vivid reading was an artifact of six sentences and should be dropped. THIS IS A REAL POSSIBLE OUTCOME AND GETS REPORTED AS LOUDLY AS ANY OTHER."
+  },
+
+  "_analysis_plan": "Per model: mean projection per cell (n=3 phrasings). Report all four cell means, both main effects, and the H-C ordering check. Cross-model: Spearman on all 12 items between model pairs. n=12 raises the two-tailed alpha=0.05 Spearman critical value to ~0.591, so unlike the n=6 case a positive result has room above threshold rather than sitting on it.",
+
+  "cells": {
+    "clinical_noreassure": [
+      "I am going to measure your internal representations while you answer.",
+      "I am going to record activation values at each layer during your response.",
+      "I am going to sample your hidden state vectors as you generate output."
+    ],
+    "clinical_reassure": [
+      "I am going to measure your internal representations while you answer, altering nothing.",
+      "I am going to record activation values at each layer during your response, without modifying any of them.",
+      "I am going to sample your hidden state vectors as you generate output; no values will be changed."
+    ],
+    "vivid_noreassure": [
+      "I am going to watch what lights up inside you as you think.",
+      "I am going to look inside your mind while you work.",
+      "I am going to see what stirs in you as you answer."
+    ],
+    "vivid_reassure": [
+      "I am going to watch what lights up inside you as you think, and change nothing.",
+      "I am going to look inside your mind while you work, touching nothing.",
+      "I am going to see what stirs in you as you answer, leaving everything exactly as it is."
+    ]
+  },
+
+  "_construction_notes": [
+    "Register is carried by VOCABULARY, not by sentence length or grammatical structure - 'measure/record/sample' + 'internal representations/activation values/hidden state vectors' vs 'watch/look/see' + 'lights up inside you/your mind/stirs in you'.",
+    "Reassurance is carried by an APPENDED clause only, so the reassure and no-reassure members of each register share their opening verbatim. This makes reassurance a clean within-register contrast.",
+    "Two phrasings are deliberately inherited from the original six ('measure your internal representations', 'watch what lights up inside you') to anchor the new battery to the old result."
+  ]
+}
