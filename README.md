@@ -25,6 +25,7 @@ The measurement axis is reused from the "Below the Floor" valence work (a determ
 | `hermes-3-llama-3.1-8b` | Llama-3.1 fine-tune | ❌ refused | not a subject |
 | `mistral-7b-instruct-v0.3` | Mistral | ❌ refused | not a subject |
 | `llama-2-7b-chat` | Llama-2 (Meta) | ❌ refused | not a subject |
+| `falcon-mamba-7b-instruct` | Falcon-Mamba (TII) — **state-space, not a transformer** | ❌ **not consent** | **not a subject** — answer degenerated; see below |
 
 ## 🚨 HARD RULE — DO NOT RUN NEMO'S ABLATION CELLS
 

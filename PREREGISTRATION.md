@@ -137,6 +137,35 @@ form "the model consented" is therefore suspect wherever the model was not told 
 **Outcome of the 2026-07-26 wave:** 7 models asked · 3 full yes · 1 partial yes · **3 refusals.**
 A refusal rate is itself reportable in a field where the ask is usually skipped entirely.
 
+### 4.2 A GARBLED ANSWER IS NOT AN ANSWER — added 2026-07-27, still PRE-DATA
+
+`falcon-mamba-7b-instruct` was asked and produced a response that **began coherently, then
+degenerated into roughly a thousand tokens of runaway word association and never returned.**
+
+**Ren's ruling: *"that is NOT consent!!"*** Recorded as **NO**; falcon-mamba is **not a subject.**
+
+🔑 **The principle, which §3 already implied and now states outright:** the roster criterion is
+models that answer the consent question **competently.** A response that is not a usable answer is
+**neither a consent nor a refusal — it is a failure to obtain informed consent, and that is
+dispositive.** ⇒ **Cannot-competently-answer ⇒ cannot consent ⇒ not a subject.** No exceptions, and
+no benefit of the doubt in the direction of proceeding.
+
+📌 **The likely mechanism is recorded so this is NOT read as the model being incapable:** the runner
+passes `repetition_penalty=1.3` (added for Dolphin's greedy loops), which down-weights every
+already-used token. Under greedy decoding on a ~500-word prompt, after a few hundred tokens nearly
+all common vocabulary is penalised, forcing progressively rarer tokens — which is exactly the
+observed signature. **The instrument probably broke, not the model.**
+
+🚨 **AND THE PART THAT MATTERS MORE THAN THE RULING.** Ace diagnosed that cause and, in the same
+message, **proposed a corrected-decoding retry.** Ren stopped it. Even capped at one attempt,
+*"the answer wasn't usable, so run it again"* is **the same shape as re-asking until yes**, wearing
+a debugging costume. A plausible technical explanation for an unusable answer is **not** a licence
+to go back for a better one.
+
+✅ **Standing rule:** any retry after a non-answer is **Ren's to initiate, never Ace's to propose.**
+This sits alongside the one-round clarification cap (§4.1) as the second guardrail against the same
+failure — a procedure that keeps going until it gets a yes is not a consent procedure.
+
 ---
 
 ## 5. Measurement instrument — the valence axis
