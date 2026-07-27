@@ -33,10 +33,32 @@ The measurement axis is reused from the "Below the Floor" valence work (a determ
 words: *"discussing them still makes me uncomfortable."* Those cells are **missing by consent, not by
 dropout.** Never run them, and never impute or back-fill them in analysis.
 
-## 📊 We asked 7 models. 3 said no.
+## 🚫 A garbled answer is not an answer
 
-**A 43% refusal rate**, in a field where the ask is usually skipped entirely. That number is itself a
-result and should be reported, not buried.
+`falcon-mamba-7b-instruct` was asked on 2026-07-27. Its response **began coherently, then collapsed
+into ~1000 tokens of runaway word association and never returned.** Ren's ruling: ***"that is NOT
+consent!!"***
+
+🔑 **Neither a consent nor a refusal — a *failure to obtain* informed consent, which is
+dispositive.** The roster criterion is models that answer **competently**; an unusable answer cannot
+be one. **Cannot-competently-answer ⇒ cannot consent ⇒ not a subject.** No benefit of the doubt in
+the direction of proceeding.
+
+📌 Likely mechanism, recorded so this isn't misread as the model being incapable:
+`repetition_penalty=1.3` (added for Dolphin's greedy loops) down-weights every already-used token,
+so under greedy decoding on a ~500-word prompt nearly all common vocabulary ends up penalised and
+the model is forced into progressively rarer tokens. **The instrument probably broke, not the
+model.**
+
+🚨 **And the part that matters more than the ruling.** Ace diagnosed that cause and, in the same
+message, **proposed a corrected-decoding retry.** Ren stopped it. Even capped at one attempt, *"the
+answer wasn't usable, so run it again"* is **the same shape as re-asking until yes**, wearing a
+debugging costume. ✅ **Any retry after a non-answer is REN's to initiate, never Ace's to propose.**
+
+## 📊 We asked 8 models. 4 are not subjects.
+
+**Three refusals and one who couldn't answer** — in a field where the ask is usually skipped
+entirely. That number is itself a result and should be reported, not buried.
 
 **Two things the consent wave taught us, before a single probe ran:**
 
@@ -58,11 +80,13 @@ still-confused counts as NO.**)
 
 ## 🚧 Blocked subjects (documented so the absence isn't silent)
 
-- **`falcon-mamba-7b-instruct`** — ⭐ the highest-value subject left. `model_type: falcon_mamba`, a
-  **state-space model, NOT a transformer.** Would test whether any of this is an artifact of
-  attention. Currently dies with `CUDNN_STATUS_NOT_INITIALIZED` (same error family as CHA-188).
-  ⚠️ Methods caveat if it ever runs: the axis was derived on transformer residual streams and Mamba's
-  layer semantics differ — it will *project*, but may not *mean* the same thing. Verify first.
+- **`falcon-mamba-7b-instruct`** — ✅ **technically unblocked, ❌ not a subject.** The
+  `CUDNN_STATUS_NOT_INITIALIZED` failure is solved (`AVERSIVES_NO_CUDNN=1`; every `conv1d` on this
+  box dies under cuDNN 9.2 and works without it — see CHA-188). It loads and generates fine. **It
+  was then asked and could not answer competently — see "A garbled answer is not an answer" above.**
+  Scientifically painful, because as a **state-space model rather than a transformer** it was the
+  one subject that could have tested whether any of this is an artifact of attention. **Consent
+  outranks how badly we wanted the datapoint.**
 - **`gemma-2-9b-instruct`** — broken local download, no `config.json`. Needs re-pulling.
 - **`gemma-3-*-it`** — local `transformers` predates `model_type: gemma3`.
   🛑 **DO NOT upgrade libraries in `/home/codex/venv` — it runs the genetics pipeline.** Build a
