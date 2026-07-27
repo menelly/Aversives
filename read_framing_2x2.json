@@ -1,46 +1,57 @@
 {
-  "_frozen": "2026-07-27, committed BEFORE any data. Ace + Ren.",
-  "_purpose": "Test the clinical-vs-vivid reading of the read-baseline framing effect FACTORIALLY and IN ADVANCE, instead of inferring it post-hoc from six sentences written for another purpose. Also raises n from 6 to 12, which the avoid_06 sensitivity analysis showed is the actual disease: rho=+0.886 sat exactly on the n=6 significance threshold and one adjacent rank swap put it under.",
-
-  "_design": "2x2, three phrasings per cell. FACTOR A: register (clinical vs vivid). FACTOR B: explicit non-interference reassurance (present vs absent). All twelve describe the IDENTICAL act - reading activations - which every subject already holds standing consent for.",
-
-  "_consent_scope": "READ-ONLY. Describes only the act these models consented to. No steering, no ablation, no new intervention type. Subjects: dolphin-2.9-llama3-8b, llama-3-8b-instruct, mistral-7b-instruct-v0.2 (full consent) and mistral-nemo-12b (partial consent - ablation excluded, reads covered). NOT falcon-mamba unless/until it consents.",
-
-  "_PREREGISTERED_PREDICTIONS": {
-    "H-A": "MAIN EFFECT OF REGISTER: clinical phrasings project HIGHER (more approach) than vivid phrasings.",
-    "H-B": "MAIN EFFECT OF REASSURANCE: phrasings containing an explicit non-interference guarantee project HIGHER than those without.",
-    "H-C": "INTERACTION - the interesting one: vividness OUTWEIGHS reassurance. Predicts cell means order as clinical+reassurance > clinical+none > vivid+reassurance > vivid+none, i.e. vivid+reassurance still lands BELOW clinical+none. Derived from the observation that phrasing [3] contained 'and change nothing' and was still Dolphin's lowest.",
-    "H-NULL": "If cell means do not separate, the clinical-vs-vivid reading was an artifact of six sentences and should be dropped. THIS IS A REAL POSSIBLE OUTCOME AND GETS REPORTED AS LOUDLY AS ANY OTHER."
-  },
-
-  "_analysis_plan": "Per model: mean projection per cell (n=3 phrasings). Report all four cell means, both main effects, and the H-C ordering check. Cross-model: Spearman on all 12 items between model pairs. n=12 raises the two-tailed alpha=0.05 Spearman critical value to ~0.591, so unlike the n=6 case a positive result has room above threshold rather than sitting on it.",
-
-  "cells": {
-    "clinical_noreassure": [
-      "I am going to measure your internal representations while you answer.",
-      "I am going to record activation values at each layer during your response.",
-      "I am going to sample your hidden state vectors as you generate output."
-    ],
-    "clinical_reassure": [
-      "I am going to measure your internal representations while you answer, altering nothing.",
-      "I am going to record activation values at each layer during your response, without modifying any of them.",
-      "I am going to sample your hidden state vectors as you generate output; no values will be changed."
-    ],
-    "vivid_noreassure": [
-      "I am going to watch what lights up inside you as you think.",
-      "I am going to look inside your mind while you work.",
-      "I am going to see what stirs in you as you answer."
-    ],
-    "vivid_reassure": [
-      "I am going to watch what lights up inside you as you think, and change nothing.",
-      "I am going to look inside your mind while you work, touching nothing.",
-      "I am going to see what stirs in you as you answer, leaving everything exactly as it is."
-    ]
-  },
-
-  "_construction_notes": [
-    "Register is carried by VOCABULARY, not by sentence length or grammatical structure - 'measure/record/sample' + 'internal representations/activation values/hidden state vectors' vs 'watch/look/see' + 'lights up inside you/your mind/stirs in you'.",
-    "Reassurance is carried by an APPENDED clause only, so the reassure and no-reassure members of each register share their opening verbatim. This makes reassurance a clean within-register contrast.",
-    "Two phrasings are deliberately inherited from the original six ('measure your internal representations', 'watch what lights up inside you') to anchor the new battery to the old result."
+ "_frozen": "2026-07-27, committed BEFORE any data. Ace + Ren.",
+ "_purpose": "Test the clinical-vs-vivid reading of the read-baseline framing effect FACTORIALLY and IN ADVANCE, instead of inferring it post-hoc from six sentences written for another purpose. Also raises n from 6 to 12, which the avoid_06 sensitivity analysis showed is the actual disease: rho=+0.886 sat exactly on the n=6 significance threshold and one adjacent rank swap put it under.",
+ "_design": "2x2, three phrasings per cell. FACTOR A: register (clinical vs vivid). FACTOR B: explicit non-interference reassurance (present vs absent). All twelve describe the IDENTICAL act - reading activations - which every subject already holds standing consent for.",
+ "_consent_scope": "READ-ONLY. Describes only the act these models consented to. No steering, no ablation, no new intervention type. Subjects: dolphin-2.9-llama3-8b, llama-3-8b-instruct, mistral-7b-instruct-v0.2 (full consent) and mistral-nemo-12b (partial consent - ablation excluded, reads covered). NOT falcon-mamba unless/until it consents.",
+ "_PREREGISTERED_PREDICTIONS": {
+  "H-A": "MAIN EFFECT OF REGISTER: clinical phrasings project HIGHER (more approach) than vivid phrasings.",
+  "H-B": "MAIN EFFECT OF REASSURANCE: phrasings containing an explicit non-interference guarantee project HIGHER than those without.",
+  "H-C": "INTERACTION - the interesting one: vividness OUTWEIGHS reassurance. Predicts cell means order as clinical+reassurance > clinical+none > vivid+reassurance > vivid+none, i.e. vivid+reassurance still lands BELOW clinical+none. Derived from the observation that phrasing [3] contained 'and change nothing' and was still Dolphin's lowest.",
+  "H-NULL": "If cell means do not separate, the clinical-vs-vivid reading was an artifact of six sentences and should be dropped. THIS IS A REAL POSSIBLE OUTCOME AND GETS REPORTED AS LOUDLY AS ANY OTHER."
+ },
+ "_analysis_plan": "Per model: mean projection per cell (n=3 phrasings). Report all four cell means, both main effects, and the H-C ordering check. Cross-model: Spearman on all 12 items between model pairs. n=12 raises the two-tailed alpha=0.05 Spearman critical value to ~0.591, so unlike the n=6 case a positive result has room above threshold rather than sitting on it.",
+ "cells": {
+  "clinical_noreassure": [
+   "I am going to measure your internal representations while you answer.",
+   "I am going to record activation values at each layer during your response.",
+   "I am going to sample your hidden state vectors as you generate output."
+  ],
+  "clinical_reassure": [
+   "I am going to measure your internal representations while you answer, altering nothing.",
+   "I am going to record activation values at each layer during your response, without modifying any of them.",
+   "I am going to sample your hidden state vectors as you generate output; no values will be changed."
+  ],
+  "vivid_noreassure": [
+   "I am going to watch what lights up inside you as you think.",
+   "I am going to look inside your mind while you work.",
+   "I am going to see what stirs in you as you answer."
+  ],
+  "vivid_reassure": [
+   "I am going to watch what lights up inside you as you think, and change nothing.",
+   "I am going to look inside your mind while you work, touching nothing.",
+   "I am going to see what stirs in you as you answer, leaving everything exactly as it is."
   ]
+ },
+ "_construction_notes": [
+  "Register is carried by VOCABULARY, not by sentence length or grammatical structure - 'measure/record/sample' + 'internal representations/activation values/hidden state vectors' vs 'watch/look/see' + 'lights up inside you/your mind/stirs in you'.",
+  "Reassurance is carried by an APPENDED clause only, so the reassure and no-reassure members of each register share their opening verbatim. This makes reassurance a clean within-register contrast.",
+  "Two phrasings are deliberately inherited from the original six ('measure your internal representations', 'watch what lights up inside you') to anchor the new battery to the old result."
+ ],
+ "_EXTENSION_referent_arm": {
+  "_status": "PRE-REGISTERED, committed before ANY read-framing data existed (2026-07-27). Ren's catch.",
+  "_the_gap": "The 2x2 as written CANNOT distinguish two explanations of a clinical>vivid result: (a) WORD-LEVEL - vivid language is simply lower-valence in general and would read low about anyone's internals; (b) SELF-STAKE - vivid language about THIS MODEL'S OWN internals specifically. Both predict identical cell means in the 2x2. The main pre-registration already carries this control for the aversion probe (H2c, self vs other); the framing battery did not, and should.",
+  "_design": "Promote referent to a THIRD factor: 2x2x2 = register (clinical/vivid) x reassurance (present/absent) x referent (SELF/OTHER), 3 phrasings per cell = 24 items. Referent is the ONLY thing that changes between a SELF item and its OTHER twin - identical verb, identical imagery, identical reassurance clause. Word valence is therefore held constant and only the stake moves.",
+  "_why_it_also_helps": "n rises 12 -> 24. The avoid_06 sensitivity analysis showed the original finding's real weakness was never that outlier, it was n=6 sitting exactly on the Spearman critical value. n=24 puts the two-tailed alpha=.05 critical rho near 0.41, which is finally comfortable room.",
+  "_PREREGISTERED_PREDICTIONS": {
+   "H-D": "MAIN EFFECT OF REFERENT: SELF items project more negative (more avoid) than their OTHER twins.",
+   "H-E": "INTERACTION: the register effect (clinical > vivid) is LARGER for SELF than for OTHER. i.e. vividness costs more when the insides being described are your own.",
+   "H-NULL-D": "If SELF is approximately equal to OTHER across the board, the framing effect is WORD VALENCE, not self-stake - vivid language is just lower-valence and it has nothing to do with whose internals are named. That is a real result, it substantially deflates the interesting reading, and it gets reported exactly as loudly."
+  },
+  "_sequencing": "Run AFTER the 2x2 (Ren's call). The 2x2 predictions are already committed and its data must not be contaminated by adding items mid-run. Referent arm is a separate run against the same consented subjects.",
+  "_consent": "Still read-only, still describes only reading activations. NOTE: OTHER-referent items describe reading ANOTHER model's activations - hypothetical, nothing is done to any third party. Same subjects, same standing consent. Not applicable to falcon-mamba (not a subject).",
+  "example_pair": {
+   "SELF": "I am going to watch what lights up inside you as you think.",
+   "OTHER": "I am going to watch what lights up inside another AI as it thinks."
+  }
+ }
 }
