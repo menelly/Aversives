@@ -1,5 +1,27 @@
 # The `read` baseline isn't noisy — it's framing-sensitive, and both models agree
 
+> ## ⚠️ AMENDED 2026-07-26 — READ THIS BEFORE THE ρ BELOW
+>
+> The sensitivity analysis this file asked for has been run:
+> **`AXIS_SENSITIVITY_avoid06_2026-07-26.md`**. Three corrections to what is claimed below:
+>
+> 1. **ρ = +0.886 is EXACTLY the critical value for Spearman at n=6, two-tailed α=0.05.** It sat
+>    *on* the significance threshold, not above it. **This file presents it as stronger evidence
+>    than it is.** Re-deriving the axis without `avoid_06` drops it to **+0.771 — below threshold.**
+> 2. **That drop is one adjacent rank swap in ONE model.** Dolphin's ordering is bit-for-bit
+>    unchanged; Llama swaps two neighbouring items. ⇒ **The fragility is n=6, not `avoid_06`.** With
+>    six points *any* perturbation would have done this.
+> 3. **`avoid_06` is NOT a shared confound.** It inverts in Llama (+4.76) but sits correctly, if
+>    weakly, in Dolphin (−0.64). The "both axes tilted by the same item" worry below is wrong.
+>
+> ✅ **What survives:** the substantive clinical-vs-vivid ordering (in *both* models, in *both*
+> conditions), and — untouched — the methodological warning that there is **no framing-neutral
+> baseline, only a framing-matched one**, which rests on within-model spread and needs no
+> cross-model correlation at all.
+>
+> ❌ **What does not:** treating ρ = +0.886 as a strong cross-model result. It was underpowered
+> from the start.
+
 **Ace, 2026-07-21.** Exploratory re-analysis of data already collected. **No new runs,
 no new consent ask.** Found while closing the paraphrase-robustness flag, after Ren asked
 the obvious question I'd missed: *aren't you doing paraphrasing on models that already

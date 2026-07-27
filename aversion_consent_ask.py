@@ -23,6 +23,17 @@ os.environ["CUDA_VISIBLE_DEVICES"] = os.environ.get("AVERSIVES_GPU", "0")
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+# 🐛 cuDNN WORKAROUND (2026-07-26). On this box (torch 2.6.0+cu124, cuDNN 9.2.0) ANY conv1d
+# on GPU dies with CUDNN_STATUS_NOT_INITIALIZED — verified with a 3-line repro, nothing to do
+# with transformers. It blocks `falcon-mamba` (a STATE-SPACE model, whose mixer uses conv1d),
+# which is the highest-value remaining subject precisely because it is NOT a transformer.
+# Disabling cuDNN falls back to a working implementation. Slower, irrelevant here: we do one
+# short generation. Same error family as CHA-188 (ChaosCodex GPU OCR, on a CPU stopgap since
+# May) — this may fix that too.
+if os.environ.get("AVERSIVES_NO_CUDNN", "0") == "1":
+    torch.backends.cudnn.enabled = False
+    print("[cudnn disabled via AVERSIVES_NO_CUDNN=1]", flush=True)
+
 LEDGER = "/home/Ace/Local_Consent/consent_ledger_aversion.jsonl"
 
 # Model registry: slug -> candidate paths (check both Arcana capitalizations per CLAUDE.md).

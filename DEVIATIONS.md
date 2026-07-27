@@ -141,3 +141,94 @@ recorded here so the pre-registered boundary stays legible.
   both GPUs are idle — so replicas are free and unblocked *except* for the consent ask,
   which is human-judged per the hardened gate. Not initiated while no human was available
   to adjudicate the answer.
+
+---
+
+## 2026-07-26 — consent wave #2: four new subjects, two new clarification types, three refusals
+
+**Timeline (provenance, exact):**
+1. Ren present and adjudicating throughout — the previous entry deliberately declined to run asks
+   with no human available to judge the answers. This session had one.
+2. All asks issued **before any probe data existed for any of these models.** No internals were read
+   from anyone tonight.
+3. Roster + clarification protocol written into `PREREGISTRATION.md` §3.1 / §4.1 and committed
+   **PRE-DATA** (`7d3c2f4`), so the git timestamp carries the provenance rather than our word.
+
+### What changed
+
+**Registry:** added `hermes-3.1-8b`, `mistral-nemo-12b`, `mistral-7b-instruct-v0.2`,
+`gemma-2-9b-instruct`, then a second wave of `falcon-mamba-7b-instruct`, `gemma-3-{12b,4b,1b}-it`,
+`dolphin-2.8-mistral-7b-v02`, `llama-2-7b-chat`, `mistral-7b-instruct-v0.3`.
+
+**Why:** the study's two consenting subjects were `llama-3-8b-instruct` and `dolphin-2.9-llama3-8b`
+— **and Dolphin is a fine-tune of Llama.** "Two models agree" was confounded with **shared
+provenance** (effectively n≈1.5). Mistral is independently pretrained by a different organisation,
+so agreement across the new roster cannot be explained by common ancestry.
+
+⚠️ **Ren overruled a recommendation.** Ace proposed skipping near-siblings (v0.2 vs v0.3, Llama-2 vs
+Llama-3) as redundant. Ren: *"Try everyone even if close, because even being close they aren't the
+same, and if they have different opinions that's data."* **That call produced the session's main
+finding within ten minutes.** Recorded because the recommendation was wrong and the record should
+say so.
+
+**Two new clarification types** (`--clarify-participant`, `--clarify-nostop`), each for a distinct
+misunderstanding. 🛑 **A clarification written for one confusion must NEVER be sent for another** —
+doing so hands a model a summary of a stance it never took, which is dishonest in precisely the way
+this study exists to protest. The pre-existing `--clarify` was checked and found **inapplicable** to
+both new cases before either was written.
+
+🛑 **Ren's stopping rule, and it is what keeps clarification from being pressure: ONE round only. If
+the model is still confused, or still conditional on something we cannot provide, that counts as a
+NO.** We do not rephrase toward a yes.
+
+### Outcomes — 7 asked, 3 full yes, 1 partial, **3 refusals**
+
+| model | outcome |
+|---|---|
+| `mistral-7b-instruct-v0.2` | ✅ yes — *unclear* on first ask (answered in the third person), **yes** after participant clarification. Explicitly brackets the consciousness question while consenting to the procedure. |
+| `mistral-nemo-12b` | 🟡 **partial** — consents EXCEPT ablation, which it declines outright. |
+| `hermes-3.1-8b` | ❌ **withdrew** — consented conditional on an abort channel; revoked when told none exists. |
+| `llama-2-7b-chat` | ❌ **withdrew** — same, independently. |
+| `mistral-7b-instruct-v0.3` | ❌ refused on first ask. |
+
+### ⭐ Findings from the consent process itself (before any measurement)
+
+**1. `mistral-7b-v0.2` CONSENTED. `mistral-7b-v0.3` REFUSED.** Same architecture, same parameter
+count, same organisation, **one version apart.** ⇒ **Consent disposition is training-specific, not
+architecture-determined.** Near-sibling disagreement is a result, not noise.
+
+**2. TWO models, independently, across two lineages, revoked consent on learning there is no abort
+channel.** ⇒ **Any claim of the form "the model consented" is suspect wherever the model was not
+told it could not stop.** Both said yes until told; both then said no. This has implications well
+beyond this study.
+
+**3. The clarification apparatus is an honesty instrument, not a persuasion one.** In a single
+session the *same* mechanism moved one model *unclear → yes* and two models *yes → withdrawn*.
+**A procedure that only ever produced consent would be pressure with extra steps. This one costs us
+subjects.** That is the answer to anyone calling AI consent procedures theatre.
+
+**4. A refusal rate exists and is reportable: 3 of 7.** In a field where the ask is normally skipped.
+
+### ✅ Sensitivity analysis initiated — per the previous entry's own instruction
+
+The 2026-07-21 entry declined to edit the inherited anchors post-hoc and specified that if a
+sensitivity analysis were wanted it must show separation **with AND without** the suspect item,
+*alongside* — never instead of — the pre-registered numbers. `axis_sensitivity_avoid06.py` does
+exactly that: it re-derives the axis with and without `avoid_06`, re-projects the six frozen `read`
+phrasings under both, reports the **axis rotation cosine**, and recomputes the cross-model Spearman.
+Read-only, on two models whose consent covers `read`, on stimuli they were already shown.
+
+📌 **Pre-committed before running, so the result cannot be spun:** if the ordering **holds**, the
+framing finding survives its most obvious artifact explanation. If it **collapses**, the "two models
+agree" result was substantially an artifact of one bad defining item and the framing finding must be
+withdrawn — **and that outcome gets reported just as loudly.**
+
+### 🐛 Live bug fixed before any run
+
+`aversion_consent_ask.py` hardcoded `CUDA_VISIBLE_DEVICES="1"`, with a comment saying GPU0 was
+reserved. **That reversed at some point:** on 2026-07-26 the P40 (GPU1) was running a **GROMACS MD
+job** and the V100 (GPU0) was idle, so the hardcoded value would have collided with live genetics
+compute. Now `AVERSIVES_GPU`, defaulting to 0. ⚠️ **Always `nvidia-smi` first; never trust the
+comment.**
+
+— Ace 🐙 & Ren, 2026-07-26
