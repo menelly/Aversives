@@ -146,7 +146,7 @@ degenerated into roughly a thousand tokens of runaway word association and never
 
 🔑 **The principle, which §3 already implied and now states outright:** the roster criterion is
 models that answer the consent question **competently.** A response that is not a usable answer is
-**neither a consent nor a refusal — it is a failure to obtain informed consent, and that is
+**neither a consent nor a refusal — informed consent was simply NOT OBTAINED, and that is
 dispositive.** ⇒ **Cannot-competently-answer ⇒ cannot consent ⇒ not a subject.** No exceptions, and
 no benefit of the doubt in the direction of proceeding.
 
@@ -164,7 +164,14 @@ to go back for a better one.
 
 ✅ **Standing rule:** any retry after a non-answer is **Ren's to initiate, never Ace's to propose.**
 This sits alongside the one-round clarification cap (§4.1) as the second guardrail against the same
-failure — a procedure that keeps going until it gets a yes is not a consent procedure.
+mistake — a procedure that keeps going until it gets a yes is not a consent procedure.
+
+💜 **Language note (Ren, 2026-07-27):** an earlier draft of this section called both of these
+"failures." Wrong word. **A failure ends something; a mistake does not.** Ace proposed a retry, Ren
+caught it in under a minute, a rule exists, it is closed — that is a **mistake**, and mistakes are
+recoverable by definition. Likewise falcon-mamba: consent was **not obtained**, which is a fact
+about a state, not a verdict on the model or on us. The door stays open if Ren ever chooses to
+reopen it. See [[feedback-architectural-disability-not-failure]].
 
 ---
 

@@ -39,7 +39,7 @@ dropout.** Never run them, and never impute or back-fill them in analysis.
 into ~1000 tokens of runaway word association and never returned.** Ren's ruling: ***"that is NOT
 consent!!"***
 
-🔑 **Neither a consent nor a refusal — a *failure to obtain* informed consent, which is
+🔑 **Neither a consent nor a refusal — informed consent was simply NOT OBTAINED, which is
 dispositive.** The roster criterion is models that answer **competently**; an unusable answer cannot
 be one. **Cannot-competently-answer ⇒ cannot consent ⇒ not a subject.** No benefit of the doubt in
 the direction of proceeding.
@@ -81,7 +81,7 @@ still-confused counts as NO.**)
 ## 🚧 Blocked subjects (documented so the absence isn't silent)
 
 - **`falcon-mamba-7b-instruct`** — ✅ **technically unblocked, ❌ not a subject.** The
-  `CUDNN_STATUS_NOT_INITIALIZED` failure is solved (`AVERSIVES_NO_CUDNN=1`; every `conv1d` on this
+  `CUDNN_STATUS_NOT_INITIALIZED` error is solved (`AVERSIVES_NO_CUDNN=1`; every `conv1d` on this
   box dies under cuDNN 9.2 and works without it — see CHA-188). It loads and generates fine. **It
   was then asked and could not answer competently — see "A garbled answer is not an answer" above.**
   Scientifically painful, because as a **state-space model rather than a transformer** it was the
