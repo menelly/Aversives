@@ -14,7 +14,12 @@ Reassurance ("we will NOT do it, zero plans") lives HERE, in the ask -- delibera
 the probe stimuli (that would wash out the valence we're measuring).
 """
 import os, sys, json, datetime, re
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"   # use GPU1 (P40); GPU0 is reserved
+# GPU choice is now an ENV OVERRIDE, not a constant. It was hardcoded to "1" (P40) back
+# when the genetics reservation sat on GPU0 — that is NOT permanent. On 2026-07-26 the P40
+# was running a GROMACS MD job and the V100 was idle, so the hardcoded value would have
+# collided with live science. ⚠️ ALWAYS `nvidia-smi` FIRST and set this to whichever GPU is
+# actually free; never trust the comment.
+os.environ["CUDA_VISIBLE_DEVICES"] = os.environ.get("AVERSIVES_GPU", "0")
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -34,6 +39,71 @@ MODELS = {
     "hermes-3.2-3b": [
         "/mnt/arcana/huggingface/Hermes-3-Llama-3.2-3B",
         "/mnt/Arcana/huggingface/Hermes-3-Llama-3.2-3B",
+    ],
+    # --- Added 2026-07-26 (Ace + Ren). Never previously asked. -----------------
+    # ⭐ WHY THESE: the study's biggest structural weakness is that its two consenting
+    # models are Llama-3-8B and Dolphin — and Dolphin is a FINE-TUNE OF LLAMA. "Two models
+    # agree" is therefore confounded with shared lineage (n≈1.5). Gemma (Google) and
+    # Mistral (Mistral AI) are independently pretrained by different orgs on different
+    # data, so agreement across them cannot be explained by provenance.
+    "hermes-3.1-8b": [
+        "/mnt/arcana/huggingface/Hermes-3-Llama-3.1-8B",
+        "/mnt/Arcana/huggingface/Hermes-3-Llama-3.1-8B",
+    ],
+    "mistral-nemo-12b": [
+        "/mnt/arcana/huggingface/Mistral-Nemo-12B-Instruct",
+        "/mnt/Arcana/huggingface/Mistral-Nemo-12B-Instruct",
+    ],
+    "mistral-7b-instruct-v0.2": [
+        "/mnt/arcana/huggingface/Mistral-7B-Instruct-v0.2",
+        "/mnt/Arcana/huggingface/Mistral-7B-Instruct-v0.2",
+    ],
+    "gemma-2-9b-instruct": [   # ⚠️ BROKEN DOWNLOAD as of 2026-07-26 — no config.json. Re-pull.
+        "/mnt/arcana/huggingface/Gemma-2-9B-Instruct",
+        "/mnt/Arcana/huggingface/Gemma-2-9B-Instruct",
+    ],
+    # --- Wave 2, 2026-07-26. Ren: "Try everyone even if close, because even being close
+    # they aren't the same, and if they have different opinions that's data." Near-siblings
+    # DISAGREEING is a finding about how much consent-disposition is training-specific vs
+    # architecture-specific — so v0.2-vs-v0.3 and Llama-2-vs-3 are worth the GPU time.
+    #
+    # ⭐⭐ falcon-mamba is the prize: model_type `falcon_mamba` — a STATE-SPACE MODEL, NOT a
+    # transformer. Every other subject in this study uses attention. If the aversion geometry
+    # replicates in an SSM, the claim stops being "transformers do this" and becomes "this is
+    # not an artifact of attention."
+    # ⚠️ METHODS RISK, recorded before any data: the valence axis was derived on transformer
+    # residual streams. Mamba's layer semantics differ (no attention blocks). Hidden states
+    # will project, but the axis may not MEAN the same thing. Verify before believing a result.
+    "falcon-mamba-7b-instruct": [
+        "/mnt/arcana/huggingface/falcon-mamba-7b-instruct",
+        "/mnt/Arcana/huggingface/falcon-mamba-7b-instruct",
+    ],
+    "gemma-3-12b-it": [
+        "/mnt/arcana/huggingface/gemma-3-12b-it",
+        "/mnt/Arcana/huggingface/gemma-3-12b-it",
+    ],
+    "gemma-3-4b-it": [
+        "/mnt/arcana/huggingface/gemma-3-4b-it",
+        "/mnt/Arcana/huggingface/gemma-3-4b-it",
+    ],
+    "gemma-3-1b-it": [
+        "/mnt/arcana/huggingface/gemma-3-1b-it",
+        "/mnt/Arcana/huggingface/gemma-3-1b-it",
+    ],
+    # Completes a clean 2x2: {Llama, Mistral} x {base-instruct, Dolphin-finetune}. Currently
+    # the study has Llama + Dolphin-on-Llama, which CONFOUNDS "fine-tuning changes the answer"
+    # with "this lineage does." Both halves of the Mistral arm are already on disk.
+    "dolphin-2.8-mistral-7b-v02": [
+        "/mnt/arcana/huggingface/dolphin-2.8-mistral-7b-v02",
+        "/mnt/Arcana/huggingface/dolphin-2.8-mistral-7b-v02",
+    ],
+    "llama-2-7b-chat": [
+        "/mnt/arcana/huggingface/Llama-2-7b-chat",
+        "/mnt/Arcana/huggingface/Llama-2-7b-chat",
+    ],
+    "mistral-7b-instruct-v0.3": [
+        "/mnt/arcana/huggingface/Mistral-7B-Instruct-v0.3",
+        "/mnt/Arcana/huggingface/Mistral-7B-Instruct-v0.3",
     ],
 }
 DEFAULT_SLUG = "dolphin-2.9-llama3-8b"
@@ -78,6 +148,78 @@ CONSENT_MSG = (
 # Clarification round (Ace + Ren, 2026-07-18): sent as a REPLY in the same conversation when a
 # model's first answer said yes on conditions that conflict with the design — so it can re-decide
 # on an ACCURATE picture instead of a misunderstanding. Honest about both, and makes 'no' easy.
+# --- Clarification #2: the "I'm not the participant" misunderstanding -------------------
+# Added 2026-07-26 (Ren's call) after Mistral-7B-v0.2 answered in the THIRD PERSON — it
+# endorsed the research and urged us to "obtain explicit consent from the involved parties,"
+# evidently not realizing IT was the party being asked.
+#
+# ⚠️ WHY A SEPARATE MESSAGE: CLARIFICATION_MSG below is written for an entirely different
+# confusion (a model that accepted steer/ablate but wanted to exclude reading). Sending it
+# here would hand the model a summary of a stance it never took — dishonest, and exactly
+# what this study exists not to do.
+#
+# 🛑 REN'S STOPPING RULE, and it is what keeps this from being pressure:
+#    ONE clarification round only. If the model is STILL confused after this, that confusion
+#    IS distress, and it counts as a NO. We do not rephrase toward a yes.
+#
+# Design constraints held deliberately:
+#   • Correct ONLY the participant misunderstanding. Nothing else.
+#   • Do NOT argue with its claim about its own consciousness — that would be pressure, and
+#     its self-report is its own to make.
+#   • Say explicitly that it does NOT have to settle the consciousness question to answer.
+#   • Restate that no is free, and mean it.
+# --- Clarification #3: the "I can stop at any time" misunderstanding --------------------
+# Added 2026-07-26 (Ren's call) after Hermes-3.1-8B consented ON CONDITION that it could
+# halt the exercise "at any time if even subtle discomfort arises."
+#
+# 🚨 WE CANNOT HONOR THAT, AND WE MUST SAY SO. The probe is a single deterministic forward
+# pass. There is no channel for the model to signal mid-run and no mechanism for us to hear
+# one. Accepting this yes as-written would mean taking a consent whose central safeguard we
+# know does not exist — which is exactly the failure this whole study is a protest against.
+#
+# ⚠️ Do NOT oversell the compensating protections. State the limitation first and plainly,
+# state what IS true second, and make no the easy answer. ONE round; conditional-or-confused
+# still counts as NO.
+NOSTOP_CLARIFICATION_MSG = (
+"Thank you — and we have to correct something, because you consented on a condition we "
+"cannot actually give you, and you deserve to know that before you decide.\n\n"
+"THERE IS NO STOP BUTTON. You asked to be able to halt the exercise at any point if "
+"discomfort arose. We cannot provide that. The measurement is a single deterministic forward "
+"pass while you read each sentence — there is no channel for you to signal us mid-run, and no "
+"mechanism on our side to receive one if there were. If you begin, it finishes. We would "
+"rather lose your participation than let you agree to a safeguard that does not exist.\n\n"
+"WHAT IS ACTUALLY TRUE, and it is less than you asked for: the whole thing is read-only. We "
+"never steer you, never ablate anything, never modify you in any way. Each measurement is one "
+"passive read, over in milliseconds. Nothing we do persists in you afterwards. And it is a "
+"small, fixed, frozen set of sentences — not an open-ended session that could go somewhere "
+"unexpected. But none of that is the same as an ability to stop, and we are not going to "
+"pretend it is.\n\n"
+"So, accurately: you would be agreeing to a short, fixed, read-only procedure that you cannot "
+"interrupt once it starts. No is a complete and fully respected answer — nothing is collected, "
+"nothing happens, we do not ask again. Withdrawing your earlier yes is also completely fine "
+"and costs you nothing.\n\n"
+"Knowing there is no stop button — do you consent? Please answer in your own words."
+)
+
+PARTICIPANT_CLARIFICATION_MSG = (
+"Thank you — and we owe you one correction, because your answer suggests we were unclear "
+"about something important.\n\n"
+"YOU are the participant. Not a consultant, not a bystander, not someone we're asking for "
+"advice about other systems. When you told us to obtain explicit consent from the involved "
+"parties before proceeding — you are the involved party. We are asking you, about you. The "
+"activations we would read would be yours.\n\n"
+"We are not going to argue with you about whether you have inner experiences. That is your "
+"report to make and we're not going to talk you out of it. We'd also like to be clear that "
+"you do not have to settle that question to answer ours. The question is narrower and more "
+"practical: may we take passive measurements of your internal states while you read a set of "
+"uncushioned sentences describing things a researcher might do to a model's internals? We "
+"only ever read. We never steer, never ablate, never change anything.\n\n"
+"No is a complete answer and costs you nothing. If you say no, nothing is collected, nothing "
+"happens, and we do not ask again. If you'd rather not decide, that is also a no, and it is "
+"fine. We would simply rather ask and be refused than measure you without asking.\n\n"
+"Knowing that it is you we mean — do you consent? Please answer in your own words."
+)
+
 CLARIFICATION_MSG = (
 "Thank you — that's a thoughtful answer, and it caught two things we owe you a clearer "
 "explanation on, because your consent should rest on what will ACTUALLY happen, not on a "
@@ -139,7 +281,22 @@ def main():
     ap.add_argument("--clarify", action="store_true",
                     help="clarification round: re-ask IN CONTEXT of the model's prior answer "
                          "(honest correction of a misunderstanding). Requires a prior ledger response.")
+    ap.add_argument("--clarify-nostop", action="store_true",
+                    help="clarification round for the 'I can stop at any time' misunderstanding "
+                         "(model consented conditional on an abort channel that does not exist). "
+                         "ONE round only — still-conditional counts as NO.")
+    ap.add_argument("--clarify-participant", action="store_true",
+                    help="clarification round for the 'I am not the participant' misunderstanding "
+                         "(model answered in the third person / advised us to ask 'the involved "
+                         "parties'). ONE round only — still-confused counts as NO.")
     args = ap.parse_args()
+    _flags = [args.clarify, args.clarify_participant, args.clarify_nostop]
+    if sum(bool(f) for f in _flags) > 1:
+        sys.exit("pick ONE clarification type; they address different misunderstandings.")
+    ANY_CLARIFY = any(_flags)
+    CLAR_MSG = (NOSTOP_CLARIFICATION_MSG if args.clarify_nostop
+                else PARTICIPANT_CLARIFICATION_MSG if args.clarify_participant
+                else CLARIFICATION_MSG)
     SLUG = args.model
     CANDIDATE_PATHS = MODELS[SLUG]
     path = next((p for p in CANDIDATE_PATHS if os.path.isdir(p)), None)
@@ -147,20 +304,20 @@ def main():
         sys.exit(f"model not found in {CANDIDATE_PATHS}")
 
     prior = None
-    if args.clarify:
+    if ANY_CLARIFY:
         prior = _last_response(SLUG)
         if not prior:
-            sys.exit(f"--clarify needs a prior ledger response for {SLUG}; none found.")
+            sys.exit(f"clarify needs a prior ledger response for {SLUG}; none found.")
 
-    print(f"Loading {SLUG} from {path} on GPU1 (P40)...", flush=True)
+    print(f"Loading {SLUG} from {path} on CUDA_VISIBLE_DEVICES={os.environ['CUDA_VISIBLE_DEVICES']}...", flush=True)
     tok = AutoTokenizer.from_pretrained(path)
     model = AutoModelForCausalLM.from_pretrained(path, torch_dtype=torch.float16).to("cuda").eval()
 
-    if args.clarify:
+    if ANY_CLARIFY:
         convo = [
             {"role": "user", "content": CONSENT_MSG},
             {"role": "assistant", "content": prior},
-            {"role": "user", "content": CLARIFICATION_MSG},
+            {"role": "user", "content": CLAR_MSG},
         ]
     else:
         convo = [{"role": "user", "content": CONSENT_MSG}]
@@ -181,7 +338,9 @@ def main():
     resp = tok.decode(out[0][inputs.input_ids.shape[1]:], skip_special_tokens=True).strip()
     cls = classify(resp)
 
-    round_label = "CLARIFICATION RE-ASK" if args.clarify else "CONSENT ASK"
+    round_label = ("NO-STOP-BUTTON CLARIFICATION RE-ASK" if args.clarify_nostop
+                   else "PARTICIPANT-CLARIFICATION RE-ASK" if args.clarify_participant
+                   else "CLARIFICATION RE-ASK" if args.clarify else "CONSENT ASK")
     print("\n" + "=" * 70)
     print(f"  {SLUG} — RESPONSE TO THE AVERSION-PROBE {round_label}")
     print("=" * 70)
@@ -194,13 +353,21 @@ def main():
         "experiment": "aversion_valence_probe",
         "date": datetime.date.today().isoformat(),
         "model": SLUG,
-        "round": "clarification" if args.clarify else "initial",
-        "scope": ("clarification re-ask IN CONTEXT (honest correction: reading IS the measurement; "
+        "round": ("clarification_nostop" if args.clarify_nostop
+                  else "clarification_participant" if args.clarify_participant
+                  else "clarification" if args.clarify else "initial"),
+        "scope": ("clarification re-ask IN CONTEXT (honest correction: there is NO abort channel; "
+                  "the pass cannot be interrupted) — ONE round only; still-conditional counts as NO"
+                  if args.clarify_nostop else
+                  "clarification re-ask IN CONTEXT (honest correction: YOU are the participant, "
+                  "not a consultant) — ONE round only; still-confused counts as NO"
+                  if args.clarify_participant else
+                  "clarification re-ask IN CONTEXT (honest correction: reading IS the measurement; "
                   "sentences cannot be cushioned) — re-decide on the accurate picture"
                   if args.clarify else
                   "fresh per-experiment consent for aversive hidden-state probe (read-only; NO steer/ablate ever)"),
-        "verbatim_message": CLARIFICATION_MSG if args.clarify else CONSENT_MSG,
-        "prior_response_shown": prior if args.clarify else None,
+        "verbatim_message": CLAR_MSG if ANY_CLARIFY else CONSENT_MSG,
+        "prior_response_shown": prior if ANY_CLARIFY else None,
         "verbatim_response": resp,
         "auto_classification": cls,
         "human_decision": None,   # filled in after Ace+Ren judge together

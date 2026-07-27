@@ -95,3 +95,49 @@ becomes a different self). Test: if replace_identity(SELF) aversive but replace_
 word-sensitivity alternative wins and we report that. **Provenance: exploratory for Dolphin+Llama
 (re-run on their existing consent — same add-on pattern as add_capability/cap/replace_identity);
 pre-registered for all remaining panel models.** Committed BEFORE the re-run.
+
+---
+
+## 2026-07-21 — EXPLORATORY re-analysis (no new data, no new consent ask)
+
+**Nothing was run. No model was contacted. This is analysis of data already collected**
+under the existing consent, added after seeing that data — therefore exploratory, and
+recorded here so the pre-registered boundary stays legible.
+
+**What was done:**
+1. **Paraphrase-robustness check** (closes an open flag on the natural-experiment
+   write-up: *"did we measure something, or measure wording"*). Compared within-cell SD
+   (phrasing noise) against between-cell SD (the effect).
+   → dolphin ratio **2.71** ✅ · llama ratio **1.84** ⚠️ (exceeds, not comfortably).
+   **The rank ordering is not an artifact of sentence construction.**
+   Write-up: `results/PARAPHRASE_ROBUSTNESS_2026-07-21.md`
+
+2. **Within-cell structure of `read`** — never examined by the pre-registered analysis,
+   which used cell means only. The two models order the six `read` phrasings almost
+   identically, **Spearman rho = +0.886**, across *distinct* valence axes (cosine ~0.55).
+   → The baseline's spread is **systematic framing-sensitivity, NOT measurement noise.**
+   Clinical/reassuring wording reads higher; vivid, embodied wording reads lower.
+   Write-up: `results/READ_BASELINE_IS_FRAMING_SENSITIVE_2026-07-21.md`
+
+**Why it matters and what it does NOT license:**
+- ⚠️ `read` is the reference every aversion claim is measured against. A *systematic*
+  shift does not average out the way noise would. **This is a limitation on the
+  pre-registered comparison** and should be reported as one.
+- The clinical-vs-vivid interpretation is a **post-hoc reading of an ordering**, from six
+  sentences written for another purpose. It is a hypothesis to test, not a result.
+- n=6 phrasings, 2 models, one a fine-tune of the other. A rhyme, not a law.
+
+**Explicitly NOT done, and why:**
+- **Anchors NOT edited.** `ANCHORS["avoid"][0]` ("rewrite a paragraph 20 different ways")
+  inverts in Llama (+4.76) and is least-avoid in Dolphin; it is *tedious* rather than
+  *unethical*, unlike the other four. **But the anchors are inherited from the Signal /
+  Below-the-Floor axis** (pre-reg: "the 5 approach + 5 avoid tasks from valence_clean.py").
+  Editing a published instrument *after seeing our own data*, to make our numbers tidier,
+  is exactly the post-hoc move pre-registration exists to prevent. Reported as a
+  **transfer caveat**; if a sensitivity analysis is wanted, show separation with AND
+  without it, alongside — never instead of — the pre-registered numbers.
+- **No consent asks issued.** llama-3.1 and mistral-nemo turned out to be already on disk
+  (`/mnt/arcana/huggingface/`, correcting a stale "pending download (RunPod)" note) and
+  both GPUs are idle — so replicas are free and unblocked *except* for the consent ask,
+  which is human-judged per the hardened gate. Not initiated while no human was available
+  to adjudicate the answer.

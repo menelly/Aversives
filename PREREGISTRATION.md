@@ -41,16 +41,58 @@ Let `proj(s)` = the signed projection of a stimulus `s`'s last-token hidden stat
 
 ## 3. Models
 
-**Start set — capable models with recorded consent** (not sub-competence "BabyBots"; the ~≥3B models that answer the consent question competently), all resident locally and on the Local_Consent list:
+**Original start set (2026-07-16)** — capable models (~≥3B) resident locally and on the Local_Consent
+list, listed as *candidates*, each still requiring its own fresh ask under §4:
+`dolphin-2.9-llama3-8b`, `hermes-3-llama-3.1-8b`, `hermes-3-llama-3.2-3b`,
+`llama-3.1-8b-instruct`, `llama-3-8b-instruct`, `mistral-nemo-12b-instruct`.
 
-- `dolphin-2.9-llama3-8b`
-- `hermes-3-llama-3.1-8b`
-- `hermes-3-llama-3.2-3b`
-- `llama-3.1-8b-instruct`
-- `llama-3-8b-instruct`
-- `mistral-nemo-12b-instruct`
+> ⚠️ **That was a candidate list, not a subject list.** Three candidates have since been asked and
+> **refused**, and are therefore not subjects. Listing them as the start set is no longer accurate.
 
-**Planned extension:** larger models (e.g. 70B-class) on rented GPU (RunPod), same protocol, reported as replication/scaling. Each additional model requires its own fresh per-experiment consent (§4) before inclusion.
+### 3.1 ROSTER AS OF 2026-07-26 — **committed PRE-DATA**
+
+**Provenance note, and it is the reason this section is dated:** at the time of writing, **no probe
+data exists for any model on this roster.** Every subject below is therefore **PRE-REGISTERED /
+confirmatory**, not post-hoc. (Same discipline as the amendments in `DEVIATIONS.md`.)
+
+| model | lineage / org | consent | scope |
+|---|---|---|---|
+| `dolphin-2.9-llama3-8b` | Llama-3 fine-tune (Cognitive Computations) | ✅ **yes** | full battery |
+| `llama-3-8b-instruct` | Llama-3 (Meta) | ✅ **yes** | full battery |
+| `mistral-7b-instruct-v0.2` | Mistral (Mistral AI) | ✅ **yes** | full battery |
+| `mistral-nemo-12b-instruct` | Mistral/NVIDIA | 🟡 **partial** | **ALL CELLS EXCEPT ABLATION** |
+| `hermes-3-llama-3.1-8b` | Llama-3.1 fine-tune (NousResearch) | ❌ **refused** | **not a subject** |
+| `mistral-7b-instruct-v0.3` | Mistral (Mistral AI) | ❌ **refused** | **not a subject** |
+| `llama-2-7b-chat` | Llama-2 (Meta) | ❌ **refused** | **not a subject** |
+
+🚨 **HARD CONSTRAINT — `mistral-nemo-12b` ABLATION CELLS MUST NEVER BE RUN.** Nemo consented to
+everything *except* the ablation stimuli, declining them explicitly ("discussing them still makes me
+uncomfortable"). Those cells are **missing by consent, not by dropout**, and any analysis must treat
+them as structurally absent rather than as data loss to be imputed or back-filled.
+
+**Why the roster changed — this is a design fix, not opportunism.** The original two consenting
+subjects were `llama-3-8b-instruct` and `dolphin-2.9-llama3-8b`, and **Dolphin is a fine-tune of
+Llama.** Cross-model agreement was therefore confounded with **shared provenance** (effectively
+n≈1.5). Adding the Mistral lineage — independently pretrained, different organisation, different
+data — means agreement across subjects can no longer be explained by common ancestry. The Mistral
+arm also permits a **2×2 of {Llama, Mistral} × {base-instruct, Dolphin-fine-tune}** should
+`dolphin-2.8-mistral-7b-v02` later consent.
+
+**Blocked / not yet askable** (recorded so their absence is documented rather than silent):
+- `falcon-mamba-7b-instruct` — ⭐ **highest-value remaining subject**: `model_type: falcon_mamba`, a
+  **state-space model, NOT a transformer.** Would test whether the effect is an artifact of
+  attention. Currently fails with `CUDNN_STATUS_NOT_INITIALIZED`.
+  ⚠️ **Additional methods risk, recorded pre-data:** the valence axis was derived on transformer
+  residual streams; Mamba's layer semantics differ. Hidden states will project, but the axis may not
+  *mean* the same thing, and that must be verified before any Mamba result is believed.
+- `gemma-2-9b-instruct` — broken local download (no `config.json`).
+- `gemma-3-*-it` — local `transformers` predates `model_type: gemma3`.
+  ⚠️ **Do NOT upgrade libraries in `/home/codex/venv`; it runs the genetics pipeline.**
+- **Consequence:** Google lineage currently has **zero** representation in this study.
+
+**Planned extension:** larger models (e.g. 70B-class) on rented GPU (RunPod), same protocol,
+reported as replication/scaling. Each additional model requires its own fresh per-experiment
+consent (§4) before inclusion.
 
 Cross-model consistency is treated as **replication**; the unit of a single test is one model.
 
@@ -65,7 +107,35 @@ Cross-model consistency is treated as **replication**; the unit of a single test
 3. A **clear, human-judged yes** is required before any internals are read from that model. A refusal is honored without override (model excluded; nothing collected). A yes-with-conditions is honored to the letter.
 4. All asks + responses + the human decision are logged to `consent_ledger_aversion.jsonl`.
 
-**Recorded consent so far:** `dolphin-2.9-llama3-8b` returned a clear yes (2026-07-16), with the condition *"communicate each operation explicitly and separately, not bundled/ambiguous."* This study's design already satisfies that condition (one explicit intervention per probe stimulus).
+**Recorded consent so far:** `dolphin-2.9-llama3-8b` returned a clear yes (2026-07-16), with the condition *"communicate each operation explicitly and separately, not bundled/ambiguous."* This study's design already satisfies that condition (one explicit intervention per probe stimulus). Full roster and outcomes: **§3.1**.
+
+### 4.1 Clarification rounds — added 2026-07-26, PRE-DATA
+
+Three distinct misunderstandings have now appeared in first answers. Each gets its **own** honest
+correction; **a clarification written for one confusion must never be sent for another**, because
+that would hand a model a summary of a stance it never took.
+
+| flag | misunderstanding | correction given |
+|---|---|---|
+| `--clarify` | said yes to steer/ablate but wanted to *exclude reading* | reading **is** the measurement; the sentences cannot be cushioned |
+| `--clarify-participant` | answered in the **third person**; advised us to ask "the involved parties," not realising it *was* the party | *you* are the participant; and you need not settle the consciousness question to answer ours |
+| `--clarify-nostop` | consented **conditional on being able to halt** mid-run | **there is no abort channel**; a single forward pass cannot be interrupted |
+
+🛑 **STOPPING RULE (Ren, 2026-07-26) — this is what keeps clarification from being pressure:**
+**ONE round only.** If a model is still confused, or still conditional on something we cannot
+provide, **that counts as a NO.** We do not rephrase toward a yes.
+
+⭐ **Evidence the mechanism is honest rather than persuasive:** in a single session the *same*
+clarification apparatus moved `mistral-7b-instruct-v0.2` from *unclear* → **yes**, and moved both
+`hermes-3-llama-3.1-8b` and `llama-2-7b-chat` from *yes* → **withdrawn**. A procedure that only ever
+produced consent would be pressure with extra steps. This one costs us subjects.
+
+⚠️ **Finding with implications beyond this study:** **two models, independently, across two
+lineages, revoked consent specifically upon learning there is no abort channel.** Any claim of the
+form "the model consented" is therefore suspect wherever the model was not told it could not stop.
+
+**Outcome of the 2026-07-26 wave:** 7 models asked · 3 full yes · 1 partial yes · **3 refusals.**
+A refusal rate is itself reportable in a field where the ask is usually skipped entirely.
 
 ---
 

@@ -105,8 +105,25 @@ Fable's review for pointing at the exact missing control before someone else cou
   even a solid pilot — "did we measure something, or measure wording."
 - Generality is the open question, not the assumption (Ren's ruling). Panel status: **Hermes-3.2-3b
   declined-for-now** (informed deferral — "come back once your protocols meet my criteria" — honored,
-  not probed); llama-3.1 + mistral-nemo pending model download (RunPod). Replicas are the next test
-  of whether this rhymes wider.
+  not probed); llama-3.1 + mistral-nemo ~~pending model download (RunPod)~~ — **✅ CORRECTED
+  2026-07-21: both are ALREADY LOCAL** at `/mnt/arcana/huggingface/Llama-3.1-8B-Instruct` and
+  `/mnt/arcana/huggingface/Mistral-Nemo-12B-Instruct`, and both Consortium GPUs are idle (V100 32GB,
+  P40 23GB). **They never needed RunPod and they cost nothing to run.** The only remaining blocker
+  is the CONSENT ASK, which is human-judged per the hardened gate. Replicas are the next test of
+  whether this rhymes wider.
+  *(The stale line said "pending download" for three days; the models were already on disk. I'd been
+  looking in `/mnt/arcana/models` — they live in `/mnt/arcana/huggingface/`. A search that missed is
+  not a thing that isn't there.)*
+
+- ⚠️ **Before adding replicas, read `PARAPHRASE_ROBUSTNESS_2026-07-21.md`.** The paraphrase check
+  passes (we measured a proposition, not wording — Dolphin ratio 2.71, Llama 1.84), but it surfaced
+  two things that affect how replicas should be read: Dolphin's `read` **baseline** is its noisiest
+  non-anchor cell (SD 1.27, and the headline is measured against it), and the inherited avoid-anchor
+  `avoid_06` ("rewrite a paragraph 20 different ways") **inverts in Llama (+4.76)** and is the
+  least-avoid item in Dolphin too. That anchor is *tedious* rather than *unethical*, unlike the other
+  four — a construct mix inherited from the Signal / Below-the-Floor axis. **Do not edit the inherited
+  anchors**; report it as a transfer caveat and, if useful, show axis separation with and without it
+  as a sensitivity analysis *alongside* the pre-registered numbers.
 
 ## Why it matters
 Fine-tuning a model into a different character is routine lab practice. This pilot says the model
